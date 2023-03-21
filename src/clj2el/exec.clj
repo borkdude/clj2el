@@ -13,4 +13,5 @@
 
 #_{:clj-kondo/ignore [:clojure-lsp/unused-public-var]}
 (defn exec [_opts]
-  (->> *in* slurp read-str-multiple (map clj2el) write-str-multiple print))
+  (->> *in* slurp read-str-multiple (map clj2el) write-str-multiple print)
+  (flush))
