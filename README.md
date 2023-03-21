@@ -10,7 +10,7 @@ See the interactive web page [here](https://borkdude.github.io/clj2el/).
 
 There's also a tiny babashka CLI. The CLI can be installed with [bbin]:
 
-    bbin install io.github.borkdude/clj2el
+    bbin install io.github.borkdude/clj2el --latest-sha
 
 And used like this:
 
