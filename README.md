@@ -8,7 +8,8 @@ See the interactive web page [here](https://borkdude.github.io/clj2el/).
 
 ## CLI
 
-There's also a tiny babashka CLI. The CLI can be installed with [bbin]:
+There's also a tiny babashka CLI: `clj2el`. The CLI can be installed with
+[bbin]:
 
     bbin install io.github.borkdude/clj2el --latest-sha
 
@@ -28,3 +29,5 @@ And used like this:
     (mapcar #'1+ (vector 1 2 3))
 
 [bbin]: https://github.com/babashka/bbin
+
+Note that you can replace a region with `clj2el` in emacs with `C-u M-|`.
