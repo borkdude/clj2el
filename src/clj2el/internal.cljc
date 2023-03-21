@@ -24,7 +24,7 @@
              ~@(map #(transpile % env) body))))
 
 (defn transpile-inc [[_let expr] env]
-  `(~'+ 1 ~(transpile expr env)))
+  `(~(symbol "1+") ~(transpile expr env)))
 
 (defn transpile-map [[_map fn expr] env]
   `(~'mapcar ~(if (and (symbol? fn)
@@ -37,7 +37,15 @@
   `(~'lambda ~(map normalize-arg args) ~@(map #(transpile % env) body)))
 
 (defn transpile-var [[_var sym] _env]
-  (symbol (str "#'" sym)))
+  (symbol (str "#'" (case sym
+                      inc (symbol "1+")
+                      sym))))
+
+(defn transpile-first [[_ arg] env]
+  `(~'car ~(transpile arg env)))
+
+(defn transpile-rest [[_ arg] env]
+  `(~'cdr ~(transpile arg env)))
 
 (defn transpile [form env]
   (if (seq? form)
@@ -48,6 +56,8 @@
       map (transpile-map form env)
       fn (transpile-fn form env)
       var (transpile-var form env)
+      first (transpile-first form env)
+      rest (transpile-rest form env)
       comment nil
       (sequence (map #(transpile % env) form)))
     form))
