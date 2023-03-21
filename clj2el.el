@@ -20,17 +20,12 @@
 
 (defun clj2el-transpile-buffer ()
   (interactive)
-  (shell-command-on-region (point-min) (point-max)
-                           "clj2el"
-                           (current-buffer)))
+  (shell-command-on-region (point-min) (point-max) "clj2el" (current-buffer)))
 
 (defun clj2el-transpile-region ()
   (interactive)
   ;; set REPLACE (fifth arg) to 't
-  (shell-command-on-region (point) (mark)
-                           "clj2el"
-                           (current-buffer)
-                           't))
+  (shell-command-on-region (point) (mark) "clj2el" (current-buffer) 't))
 
 (provide 'clj2el)
 ;;; clj2el.el ends here
