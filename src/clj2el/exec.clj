@@ -1,4 +1,4 @@
-(ns clj2el.cli
+(ns clj2el.exec
   (:require
    [clj2el.api :refer [clj2el]]
    [clojure.pprint :refer [pprint]]
