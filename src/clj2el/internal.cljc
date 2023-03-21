@@ -48,7 +48,8 @@
   `(~'cdr ~(transpile arg env)))
 
 (defn transpile [form env]
-  (if (seq? form)
+  (cond
+    (seq? form)
     (case (first form)
       let (transpile-let form env)
       inc (transpile-inc form env)
@@ -60,6 +61,5 @@
       rest (transpile-rest form env)
       comment nil
       (sequence (map #(transpile % env) form)))
-    form))
-
-
+    (vector? form) (list* 'vector (map #(transpile % env) form))
+    :else form))
