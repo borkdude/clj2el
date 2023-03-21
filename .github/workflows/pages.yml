@@ -11,6 +11,9 @@ jobs:
   build-and-deploy:
     concurrency: ci-${{ github.ref }} # Recommended if you intend to make multiple deployments in quick succession.
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
     steps:
 
       - name: Checkout 🛎️
@@ -30,11 +33,7 @@ jobs:
       - name: Install and Build 🔧 # This example project is built using npm and outputs the result to the 'build' folder. Replace with the commands required to build your project, or remove this step entirely if your site is pre-built.
         run: |
           npm install
-          bb release
-
-      - name: Transform README
-        run: |
-          bb readme
+          npx shadow-cljs release main
 
         # To be able to deploy your own version you have to choose the
         # "GitHub Actions" option in your project settings.
