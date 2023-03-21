@@ -1,6 +1,6 @@
 ;;; clj2el.el --- Description -*- lexical-binding: t; -*-
 ;;
-;; Copyright (C) 2023 Teodor Heggelund
+;; Copyright (C) 2023
 ;;
 ;; Author:
 ;; Maintainer:
