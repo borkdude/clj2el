@@ -12,5 +12,4 @@
   (str/join "\n" (map #(with-out-str (pprint %)) forms)))
 
 (defn -main [& _args]
-  (let [clj2el-fn (partial map clj2el)]
-    (-> *in* slurp read-str-multiple clj2el-fn write-str-multiple print)))
+  (->> *in* slurp read-str-multiple (map clj2el) write-str-multiple print))
