@@ -18,16 +18,12 @@
 ;;
 ;;; Code:
 
-(defun clj2el-transpile* (form))
-
-(defmacro clj2el-transpile (form)
-  (list 'clj2el-transpile* form))
-
 (defun clj2el-transpile-buffer ()
   (interactive)
   (shell-command-on-region (point-min) (point-max)
                            "clj2el"
                            (current-buffer)))
+
 
 (provide 'clj2el)
 ;;; clj2el.el ends here
