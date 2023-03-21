@@ -24,5 +24,6 @@
         write-str-fn (cond (and multiple? pretty?) pprint-str-multiple-forms
                            (and multiple? (not pretty?)) prn-str-multiple-forms
                            (and (not multiple?) pretty?) pprint-str
-                           (and (not multiple?) (not pretty?)) prn-str)]
-    (-> *in* slurp read-fn clj2el write-str-fn print)))
+                           (and (not multiple?) (not pretty?)) prn-str)
+        clj2el-fn (if multiple? (partial map clj2el) clj2el)]
+    (-> *in* slurp read-fn clj2el-fn write-str-fn print)))
