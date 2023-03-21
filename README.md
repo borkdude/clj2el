@@ -30,4 +30,15 @@ And used like this:
 
 [bbin]: https://github.com/babashka/bbin
 
+
 Note that you can replace a region with `clj2el` in emacs with `C-u M-|`.
+
+## Using `clj2el.el` from Doom Emacs
+
+```emacs-lisp
+;; packages.el
+(package! clj2el :recipe (:host github :repo "borkdude/clj2el" :files ("*.el")))
+
+;; config.el
+(use-package! clj2el)
+```
