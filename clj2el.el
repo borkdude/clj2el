@@ -24,7 +24,6 @@
 
 (defun clj2el-transpile-region ()
   (interactive)
-  ;; set REPLACE (fifth arg) to 't
   (shell-command-on-region (point) (mark) "clj2el" (current-buffer) 't))
 
 (provide 'clj2el)
