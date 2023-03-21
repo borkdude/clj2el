@@ -14,21 +14,23 @@ There's also a tiny babashka CLI. The CLI can be installed with [bbin]:
 
 And used like this:
 
+    $ ls
+    source.clj  source2.clj
     $ cat source.clj
     (defn foo [x & xs] xs)
 
     (inc 2)
 
     (map inc [1 2 3])
-    $ cat source.clj | clj2el --multiple
+    $ cat source.clj | clj2el
     (defun foo (x &rest xs) xs)
 
     (1+ 2)
 
-    (mapcar #'1+ (list 1 2 3))
+    (mapcar #'1+ (vector 1 2 3))
     $ cat source2.clj
     [1 2 3]
     $ cat source2.clj | clj2el
-    (list 1 2 3)
+    (vector 1 2 3)
 
 [bbin]: https://github.com/babashka/bbin
