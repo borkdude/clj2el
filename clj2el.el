@@ -26,7 +26,7 @@
   (interactive)
   (shell-command-on-region (point) (mark) "clj2el" (current-buffer) 't))
 
-(defmacro clj! (expr)
+(defmacro clj2el-clj! (expr)
   (let* ((expr-as-string (prin1-to-string expr))
          (temp-buf "*el2clj-work*"))
     (get-buffer-create temp-buf)
@@ -39,14 +39,16 @@
            (expr (car read)))
       expr)))
 
-(defmacro clj2el--comment
+(defmacro clj2el-comment
     (expr))
 
-(clj2el--comment
- (clj! (do (defn foo [x] (inc x))
-           (defn bar [x] (inc x))
-           (foo (bar 3)))) ;;=> 5
- ) ;; => 5
+(clj2el-comment
+ (clj2el-clj!
+  (do (defn foo [x] (inc x))
+      (defn bar [x] (inc x))
+      (foo (bar 3))))
+ ;;=> 5
+ )
 
 (provide 'clj2el)
 ;;; clj2el.el ends here
