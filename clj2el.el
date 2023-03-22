@@ -26,5 +26,27 @@
   (interactive)
   (shell-command-on-region (point) (mark) "clj2el" (current-buffer) 't))
 
+(defmacro clj! (expr)
+  (let* ((expr-as-string (prin1-to-string expr))
+         (temp-buf "*el2clj-work*"))
+    (get-buffer-create temp-buf)
+    (let* ((elisp-code (with-current-buffer temp-buf
+                         (erase-buffer)
+                         (insert expr-as-string)
+                         (shell-command-on-region (point-min) (point-max) "clj2el" temp-buf)
+                         (buffer-substring (point-min) (point-max))))
+           (read (read-from-string elisp-code))
+           (expr (car read)))
+      expr)))
+
+(defmacro clj2el--comment
+    (expr))
+
+(clj2el--comment
+ (clj! (progn (defn foo [x] (inc x))
+              (defn bar [x] (inc x))
+              (foo (bar 3)))) ;;=> 5
+ ) ;; => 5
+
 (provide 'clj2el)
 ;;; clj2el.el ends here
