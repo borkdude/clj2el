@@ -43,9 +43,9 @@
     (expr))
 
 (clj2el--comment
- (clj! (progn (defn foo [x] (inc x))
-              (defn bar [x] (inc x))
-              (foo (bar 3)))) ;;=> 5
+ (clj! (do (defn foo [x] (inc x))
+           (defn bar [x] (inc x))
+           (foo (bar 3)))) ;;=> 5
  ) ;; => 5
 
 (provide 'clj2el)
