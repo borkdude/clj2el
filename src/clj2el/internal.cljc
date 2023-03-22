@@ -53,6 +53,9 @@
 (defmethod transpile-call 'comment [_form _env]
   nil)
 
+(defmethod transpile-call 'do [[_do & exprs] env]
+  (list* 'progn (map #(transpile % env) exprs)))
+
 (defmethod transpile-call :default [form env]
   (sequence (map #(transpile % env) form)))
 
