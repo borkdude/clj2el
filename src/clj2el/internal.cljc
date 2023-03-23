@@ -95,4 +95,7 @@
                 a) {})
 
   (transpile '(defn foo [x & [opt]] opt) {})
+
+  (transpile '(let [[x y] [1 2 3]]
+                [x y]) {})
   )
