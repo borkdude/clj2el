@@ -56,6 +56,9 @@
 (defmethod transpile-call 'do [[_do & exprs] env]
   (list* 'progn (map #(transpile % env) exprs)))
 
+(defmethod transpile-call 'def [[_def & exprs] env]
+  (list* 'setq (map #(transpile % env) exprs)))
+
 (defmethod transpile-call :default [form env]
   (sequence (map #(transpile % env) form)))
 
