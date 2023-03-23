@@ -59,6 +59,12 @@
 (defmethod transpile-call 'def [[_def & exprs] env]
   (list* 'setq (map #(transpile % env) exprs)))
 
+(defmethod transpile-call 'assoc [[_assoc m k v] env]
+  (list 'plist-put (transpile m env) (transpile k env) (transpile v env)))
+
+(defmethod transpile-call 'get [[_assoc m k] env]
+  (list 'plist-get (transpile m env) (transpile k env)))
+
 (defmethod transpile-call :default [form env]
   (sequence (map #(transpile % env) form)))
 
@@ -67,4 +73,5 @@
     (seq? form)
     (transpile-call form env)
     (vector? form) (list* 'vector (map #(transpile % env) form))
+    (map? form) (cons 'list (map #(transpile % env) (apply concat form)))
     :else form))

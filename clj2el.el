@@ -40,14 +40,24 @@
       expr)))
 
 (defmacro clj2el-comment
-    (expr))
+    (&rest _exprs))
 
 (clj2el-comment
  (clj2el-clj!
   (do (defn foo [x] (inc x))
-      (defn bar [x] (inc x))
-      (foo (bar 3))))
- ;;=> 5
+      (defn bar [x] (inc x))))
+ (foo (bar 3)) ;;=> 5
+ (clj2el-clj!
+  (def m {:a 1 :b 2})
+  )
+ m ;;=> (:a 1 :b 2)
+ (clj2el-clj!
+  (get m :a)) ;;=> 1
+ (clj2el-clj!
+  (do
+   (defn foo [m]
+     (get m :a))
+   (foo {:a 1}))) ;;=> 1
  )
 
 (provide 'clj2el)
