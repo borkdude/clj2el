@@ -1,4 +1,5 @@
-(ns clj2el.internal)
+(ns clj2el.internal
+  (:require [clj2el.internal.destructure :as destructure]))
 
 (declare transpile)
 
@@ -15,10 +16,12 @@
                            (first call)))
 
 (defmethod transpile-call 'defn [[_defn name args & body] env]
-  `(~'defun ~name ~(map normalize-arg args) ~@(map #(transpile % env) body)))
+  (let [[args & body] (destructure/maybe-destructured args body)]
+    `(~'defun ~name ~(map normalize-arg args) ~@(map #(transpile % env) body))))
 
 (defmethod transpile-call 'let [[_let bindings & body] env]
-  (let [[bindings env]
+  (let [bindings (destructure/destructure bindings)
+        [bindings env]
         (reduce (fn [[bindings env] [binding expr]]
                   [(conj bindings (list binding (transpile expr env))) (add-local env binding)])
                 [[] env]
@@ -65,6 +68,9 @@
 (defmethod transpile-call 'get [[_assoc m k] env]
   (list 'plist-get (transpile m env) (transpile k env)))
 
+(defmethod transpile-call 'nth [[_nth obj idx] env]
+  (list 'nth idx (transpile obj env)))
+
 (defmethod transpile-call :default [form env]
   (sequence (map #(transpile % env) form)))
 
@@ -75,3 +81,18 @@
     (vector? form) (list* 'vector (map #(transpile % env) form))
     (map? form) (cons 'list (map #(transpile % env) (apply concat form)))
     :else form))
+
+;;;; Scratch
+
+(comment
+  (transpile '(let [[x] '(1)]
+                x) {})
+
+  (transpile '(let [{:keys [a]} {:a 1}]
+                a) {})
+
+  (transpile '(let [{:syms [a]} {'a 1}]
+                a) {})
+
+  (transpile '(defn foo [x & [opt]] opt) {})
+  )

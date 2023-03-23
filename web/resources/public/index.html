@@ -23,11 +23,23 @@
       y (first x)]
   [x y])
 
+(let [[x y] [1 2 3]]
+  [x y])
+
+(let [{:keys [x y]} {:x 1 :y 2}]
+  [x y])
+
 (def m {:a 1 :b 2})
 
 (assoc m :c 3)
 
-(get m :a)</pre>
+(get m :a)
+
+(defn foo [{:keys [a b]}]
+  (+ a b))
+
+(foo {:a 1 :b 2})
+      </pre>
     </div>
 
   </body>

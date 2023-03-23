@@ -58,6 +58,7 @@
    (defn foo [m]
      (get m :a))
    (foo {:a 1}))) ;;=> 1
+ (clj2el-clj! (do (get {'foo 1 'dude 2} 'foo)))
  )
 
 (provide 'clj2el)
