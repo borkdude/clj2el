@@ -47,9 +47,7 @@
                      (let [gmap (gensym "map__")
                            defaults (:or b)]
                        (loop [ret (-> bvec (conj gmap) (conj v)
-                                      (conj gmap) (conj (list 'if nil ;; TODO (list seq? gmap)
-                                                              `(clojure.core/seq-to-map-for-destructuring ~gmap)
-                                                              gmap))
+                                      ;; (conj gmap) (conj gmap)
                                       ((fn [ret]
                                          (if (:as b)
                                            (conj ret (:as b) gmap)
