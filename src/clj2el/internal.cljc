@@ -69,7 +69,7 @@
   (list 'plist-get (transpile m env) (transpile k env)))
 
 (defmethod transpile-call 'nth [[_nth obj idx] env]
-  (list 'nth idx (transpile obj env)))
+  (list 'elt idx (transpile obj env)))
 
 (defmethod transpile-call :default [form env]
   (sequence (map #(transpile % env) form)))
