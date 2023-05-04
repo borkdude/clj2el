@@ -71,8 +71,21 @@
 (defmethod transpile-call 'nth [[_nth obj idx] env]
   (list 'elt (transpile obj env) (transpile idx env)))
 
+(defmethod transpile-call 'juxt [[_juxt & fns] env]
+  (list 'lambda
+        '(&rest xs)
+        `(~'mapcar
+          ~'(lambda (f) (apply f xs))
+          '~(map #(transpile % env) fns))))
+
 (defmethod transpile-call :default [form env]
   (sequence (map #(transpile % env) form)))
+
+(defn transpile-symbol [sym]
+  (condp = sym
+    'inc (symbol "1+")
+    'dec (symbol "1-")
+    sym))
 
 (defn transpile [form env]
   (cond
@@ -80,6 +93,7 @@
     (transpile-call form env)
     (vector? form) (list* 'vector (map #(transpile % env) form))
     (map? form) (cons 'list (map #(transpile % env) (apply concat form)))
+    (symbol? form) (transpile-symbol form)
     :else form))
 
 ;;;; Scratch
@@ -98,4 +112,11 @@
 
   (transpile '(let [[x y] [1 2 3]]
                 [x y]) {})
+
+  (transpile '(juxt inc dec) {})
+  ;; => (lambda
+  ;;     (&rest xs)
+  ;;     (mapcar
+  ;;      (lambda (f) (apply f xs))
+  ;;      '(1+ 1-)))
   )
