@@ -1,0 +1,62 @@
+name: CI
+
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ${{matrix.os}}
+    continue-on-error: ${{matrix.emacs_version == 'snapshot'}}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        emacs_version: ["27.2", "28.1"]
+        include:
+          - os: ubuntu-latest
+            emacs_version: "snapshot"
+
+    steps:
+      - name: Check out the source code
+        uses: actions/checkout@v2
+
+      - name: Install clojure tools
+        uses: DeLaGuardo/setup-clojure@10.3
+        with:
+          # Install just one or all simultaneously
+          # The value must indicate a particular version of the tool, or use 'latest'
+          # to always provision the latest version
+          cli: latest
+          bb: 0.7.8 # Babashka
+
+      - name: Set up Emacs
+        if: "!startsWith (matrix.os, 'windows')"
+        uses: purcell/setup-emacs@master
+        with:
+          version: ${{matrix.emacs_version}}
+
+      - name: Set up Emacs on Windows
+        if: startsWith (matrix.os, 'windows')
+        uses: jcs090218/setup-emacs-windows@master
+        with:
+          version: ${{matrix.emacs_version}}
+
+      - name: Workaround for Emacs 27.2 bug on MS-Windows
+        if: startsWith (matrix.os, 'windows')
+        run: |
+          # Remove expired DST Root CA X3 certificate. Workaround
+          # for https://debbugs.gnu.org/cgi/bugreport.cgi?bug=51038
+          # bug on Emacs 27.2.
+          gci cert:\LocalMachine\Root\DAC9024F54D8F6DF94935FB1732638CA6AD77C13
+          gci cert:\LocalMachine\Root\DAC9024F54D8F6DF94935FB1732638CA6AD77C13 | Remove-Item
+      - name: Symlink sh to /bin/sh
+        run: ln -s $(which sh) /bin/sh
+
+      - name: Setup Eldev
+        uses: juergenhoetzel/setup-eldev-emacs@master
+
+      - name: Output Eldev version
+        run: |
+          eldev --version
+
+      - name: Test the project
+        run: |
+          eldev -dtT test
