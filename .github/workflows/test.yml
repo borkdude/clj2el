@@ -1,0 +1,92 @@
+name: CI
+
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ${{matrix.os}}
+    continue-on-error: ${{matrix.emacs_version == 'snapshot'}}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        emacs_version: ["27.2", "28.1"]
+        include:
+          - os: ubuntu-latest
+            emacs_version: "snapshot"
+
+    steps:
+      - name: Check out the source code
+        uses: actions/checkout@v2
+
+      - name: Install clojure tools
+        uses: DeLaGuardo/setup-clojure@10.3
+        with:
+          # Install just one or all simultaneously
+          # The value must indicate a particular version of the tool, or use 'latest'
+          # to always provision the latest version
+          cli: latest
+          bb: latest
+
+      - name: Set up Emacs
+        if: "!startsWith (matrix.os, 'windows')"
+        uses: purcell/setup-emacs@master
+        with:
+          version: ${{matrix.emacs_version}}
+
+      - name: Set up Emacs on Windows
+        if: startsWith (matrix.os, 'windows')
+        uses: jcs090218/setup-emacs-windows@master
+        with:
+          version: ${{matrix.emacs_version}}
+
+      - name: Workaround for Emacs 27.2 bug on MS-Windows
+        if: startsWith (matrix.os, 'windows')
+        run: |
+          # Remove expired DST Root CA X3 certificate. Workaround
+          # for https://debbugs.gnu.org/cgi/bugreport.cgi?bug=51038
+          # bug on Emacs 27.2.
+          gci cert:\LocalMachine\Root\DAC9024F54D8F6DF94935FB1732638CA6AD77C13
+          gci cert:\LocalMachine\Root\DAC9024F54D8F6DF94935FB1732638CA6AD77C13 | Remove-Item
+
+      - name: Install bbin
+        if: "!startsWith (matrix.os, 'windows')"
+        run: |
+          curl -o- -L https://raw.githubusercontent.com/babashka/bbin/v0.1.13/bbin > /usr/local/bin/bbin
+          chmod +x /usr/local/bin/bbin
+          mkdir -p "${HOME}/.babashka/bbin/bin
+          echo "${HOME}/.babashka/bbin/bin" >> $GITHUB_PATH"
+
+      - name: Install bbin (Windows)
+        if: startsWith (matrix.os, 'windows')
+        run: |
+          iex "& {$(irm get.scoop.sh)} -RunAsAdmin"
+          scoop bucket add extras
+          scoop bucket add scoop-clojure https://github.com/littleli/scoop-clojure
+          scoop install bbin
+
+      - name: Install clj2el as executable
+        if: "!startsWith (matrix.os, 'windows')"
+        run: bbin install .
+
+      - name: Install clj2el as executable
+        if: startsWith (matrix.os, 'windows')
+        run: |
+          iex "& {$(irm get.scoop.sh)} -RunAsAdmin"
+          scoop bucket add extras
+          scoop bucket add scoop-clojure https://github.com/littleli/scoop-clojure
+          scoop install bbin
+          bbin install .
+
+      - name: Install Eldev
+        if: "!startsWith (matrix.os, 'windows')"
+        run: curl -fsSL https://raw.github.com/doublep/eldev/master/webinstall/github-eldev | sh
+
+      - name: Install Eldev on MS-Windows
+        if: startsWith (matrix.os, 'windows')
+        run: |
+          curl.exe -fsSL https://raw.github.com/doublep/eldev/master/webinstall/github-eldev.bat | cmd /Q
+
+      - name: Test the project
+        run: |
+          export PATH="$PATH:$HOME/.babashka/bbin/bin"
+          eldev -dtT test

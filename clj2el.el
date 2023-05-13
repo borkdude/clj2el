@@ -59,6 +59,16 @@
      (get m :a))
    (foo {:a 1}))) ;;=> 1
  (clj2el-clj! (do (get {'foo 1 'dude 2} 'foo)))
+ (clj2el-clj!
+  ((juxt inc dec)
+   1))
+ (clj2el-clj!
+  ((juxt + -)
+   0 1 2 3 4 5))
+ (clj2el-clj!
+  (let [fns (juxt + -)]
+    fns
+    (funcall fns 1 2)))
  )
 
 (provide 'clj2el)
