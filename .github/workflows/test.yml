@@ -8,8 +8,8 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        emacs_version: ["27.2", "28.1"]
+        os: [macos-latest, ubuntu-latest, windows-latest]
+        emacs_version: ["27.2", "28.2"]
         include:
           - os: ubuntu-latest
             emacs_version: "snapshot"
@@ -26,6 +26,10 @@ jobs:
           # to always provision the latest version
           cli: latest
           bb: latest
+
+      - name: Prime babashka
+        run: |
+          bb clojure --help
 
       - name: Set up Emacs
         if: "!startsWith (matrix.os, 'windows')"
@@ -63,19 +67,7 @@ jobs:
           scoop bucket add extras
           scoop bucket add scoop-clojure https://github.com/littleli/scoop-clojure
           scoop install bbin
-
-      - name: Install clj2el as executable
-        if: "!startsWith (matrix.os, 'windows')"
-        run: bbin install .
-
-      - name: Install clj2el as executable
-        if: startsWith (matrix.os, 'windows')
-        run: |
-          iex "& {$(irm get.scoop.sh)} -RunAsAdmin"
-          scoop bucket add extras
-          scoop bucket add scoop-clojure https://github.com/littleli/scoop-clojure
-          scoop install bbin
-          bbin install .
+          get-command bbin.cmd | split-path -parent | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Install Eldev
         if: "!startsWith (matrix.os, 'windows')"
@@ -88,5 +80,4 @@ jobs:
 
       - name: Test the project
         run: |
-          export PATH="$PATH:$HOME/.babashka/bbin/bin"
           eldev -dtT test

@@ -18,22 +18,35 @@
 ;;
 ;;; Code:
 
+(defcustom clj2el-command
+  "clj2el"
+  "The command used to execute clj2el."
+  :type 'string
+  :group 'clj2el)
+
 (defun clj2el-transpile-buffer ()
   (interactive)
-  (shell-command-on-region (point-min) (point-max) "clj2el" (current-buffer)))
+  (shell-command-on-region (point-min) (point-max) clj2el-command (current-buffer)))
 
 (defun clj2el-transpile-region ()
   (interactive)
-  (shell-command-on-region (point) (mark) "clj2el" (current-buffer) 't))
+  (shell-command-on-region (point) (mark) clj2el-command (current-buffer) 't))
 
 (defmacro clj2el-clj! (expr)
+  "Transpile clojure like EXPR form to elisp and eval it.
+
+Transpilation is performed by sending EXPR as input to
+`clj2el-command'.  Signals an error if the program cannot be find
+or an error is reported."
   (let* ((expr-as-string (prin1-to-string expr))
          (temp-buf "*el2clj-work*"))
     (get-buffer-create temp-buf)
     (let* ((elisp-code (with-current-buffer temp-buf
                          (erase-buffer)
                          (insert expr-as-string)
-                         (shell-command-on-region (point-min) (point-max) "clj2el" temp-buf)
+                         (when (not (= (shell-command-on-region (point-min) (point-max) clj2el-command temp-buf) 0))
+                           (error ":clj23el-clj!-cmd-error :clj2el-command %S :error %s"
+                                  clj2el-command (buffer-substring-no-properties (point-min) (point-max))))
                          (buffer-substring (point-min) (point-max))))
            (read (read-from-string elisp-code))
            (expr (car read)))
@@ -43,6 +56,7 @@
     (&rest _exprs))
 
 (clj2el-comment
+ (setq clj2el-command "bb -x clj2el.exec/exec")
  (clj2el-clj!
   (do (defn foo [x] (inc x))
       (defn bar [x] (inc x))))
